@@ -4,13 +4,15 @@ const Appointment = require('../models/Appointment')
 
 exports.listAvailableProfessors = async (req, res) => {
   try {
-    const professors = await User.find({ role: 'professor' }, { name: 1, email: 1 });
+    const { date, professorId } = req.body;
 
-    const { date } = req.query;
     const filterDate = date ? new Date(date) : null;
-    const availabilityData = await Availability.find(
-      filterDate ? { date: filterDate } : {}
-    );    
+
+    const professorQuery = professorId ? { _id: professorId, role: 'professor' } : { role: 'professor' };
+    const professors = await User.find(professorQuery, { name: 1, email: 1 });
+
+    const availabilityQuery = filterDate ? { date: filterDate } : {};
+    const availabilityData = await Availability.find(availabilityQuery);
 
     const result = professors.map((professor) => {
       const availability = availabilityData.filter(
