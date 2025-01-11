@@ -1,3 +1,5 @@
+//File to connect to the database
+
 require('dotenv').config()
 const mongoose = require('mongoose');
 const MONGO_URL = process.env.MONGO_URI;

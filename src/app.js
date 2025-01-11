@@ -6,29 +6,32 @@ const connectDB = require('./db.js')
 const Authentication = require('./middleware/authMiddleware.js')
 
 dotenv.config();
+const PORT = process.env.PORT || 5000;
 
 const app = express();
+
+//authRoutes for signup, login and logout
+const authRoutes = require('./routes/authRoutes');
+//studentRoutes for viewing all available slots, booking a slot and viewing all booked slots
+const studentRoutes = require('./routes/studentRoutes');
+//professorRoutes for creating a new availability, viewing all booked slots and cancelling a booked slot
+const professorRoutes = require('./routes/professorRoutes.js');
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: true, credentials: true }));
 
-const authRoutes = require('./routes/authRoutes');
-const studentRoutes = require('./routes/studentRoutes');
-const professorRoutes = require('./routes/professorRoutes.js');
-
 app.use('/auth', authRoutes);
+//authentication middleware to check if the user is authenticated needed for students and professors
 app.use('/students', Authentication, studentRoutes);
 app.use('/professors', Authentication, professorRoutes);
 
 app.use((req, res) => {
-    res.status(404).json({ message: 'Route not found' });
+    res.status(404).json({ message: 'Route does not exist, please check the documentation' });
 });
 
-const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server started on port ${PORT}`);
 });
 
 connectDB();

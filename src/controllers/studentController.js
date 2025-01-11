@@ -1,7 +1,8 @@
 const User = require('../models/User');
 const Availability = require('../models/Availability');
-const Appointment = require('../models/Appointment')
+const Appointment = require('../models/Appointment');
 
+//Listing all available slots optionally filtered by date and professorId
 exports.listAvailableProfessors = async (req, res) => {
   try {
     const { date, professorId } = req.body;
@@ -30,7 +31,7 @@ exports.listAvailableProfessors = async (req, res) => {
     });
 
     res.status(200).json({
-      message: 'List of professors with their available slots',
+      message: 'List of all available slots',
       data: result,
     });
   } catch (err) {
@@ -42,12 +43,13 @@ exports.listAvailableProfessors = async (req, res) => {
   }
 };
 
+//Booking a slot for a professor and student, removing the booked time slot from the professor's availability
 exports.bookslot = async (req, res) => {
     try {
       const { professorId, date, timeSlot } = req.body;
-      const studentId = req.user._id; // Assuming `req.user` contains the authenticated student's details
+      const studentId = req.user._id;
   
-      // Validate required fields
+      // Checking if all the required fields are provided
       if (!professorId || !date || !timeSlot) {
         return res.status(400).json({ message: 'Professor ID, date, and time slot are required' });
       }
@@ -55,8 +57,8 @@ exports.bookslot = async (req, res) => {
       // Check if the professor is available for the given date and time slot
       const availability = await Availability.findOne({
         professorId,
-        date: new Date(date), // Ensure date is in Date format
-        timeSlots: timeSlot, // Check if the timeSlot exists in the array
+        date: new Date(date),
+        timeSlots: timeSlot,
       });
   
       if (!availability) {
@@ -71,10 +73,10 @@ exports.bookslot = async (req, res) => {
         timeSlot
       });
   
-      // Remove the booked time slot from the professor's availability
+      // Removing the booked time slot from the professor's availability
       await Availability.updateOne(
         { professorId, date: new Date(date) },
-        { $pull: { timeSlots: timeSlot } } // Remove the booked timeSlot
+        { $pull: { timeSlots: timeSlot } }
       );
   
       res.status(201).json({ message: 'Slot booked successfully', appointment });
@@ -84,17 +86,15 @@ exports.bookslot = async (req, res) => {
     }
 };
 
+//Viewing all booked slots for a student, if professor cancels slot, it will be removed from the student's booked slots
 exports.viewbookedslots = async (req, res) => {
     try {
-      // Extract the student ID from the authenticated user
       const studentId = req.user._id;
   
-      // Fetch all booked appointments for the student
       const bookedSlots = await Appointment.find({ 
         studentId 
-      }).populate('professorId', 'name email'); // Populate professor details
-  
-      // Check if the student has any bookings
+      }).populate('professorId', 'name email');
+
       if (bookedSlots.length === 0) {
         return res.status(404).json({ message: 'No booked slots found' });
       }
