@@ -4,7 +4,7 @@ const Appointment = require('../models/Appointment');
 exports.createSlot = async (req, res) => {
   try {
     const { date, timeSlots } = req.body;
-    const professorId = req.user._id; // Assuming authenticated professor
+    const professorId = req.user._id;
 
     // Check if the professor already has availability for the date
     let availability = await Availability.findOne({ professorId, date: new Date(date) });
@@ -19,49 +19,19 @@ exports.createSlot = async (req, res) => {
       availability = await Availability.create({ professorId, date: new Date(date), timeSlots });
     }
 
-    res.status(201).json({ message: 'Slot created successfully', availability });
+    res.status(201).json({ message: 'Slots created successfully', availability });
   } catch (err) {
     console.error('Error creating slot:', err.message);
     res.status(500).json({ message: 'Failed to create slot', error: err.message });
   }
 };
 
-exports.deleteSlot = async (req, res) => {
-    try {
-      const { date, timeSlots } = req.body;
-      const professorId = req.user._id; // Assuming authenticated professor
-  
-      // Find the availability for the given date
-      const availability = await Availability.findOne({ professorId, date: new Date(date) });
-  
-      if (!availability) {
-        return res.status(404).json({ message: 'No availability found for the given date' });
-      }
-  
-      // Remove the specified time slots
-      availability.timeSlots = availability.timeSlots.filter((slot) => !timeSlots.includes(slot));
-  
-      // Delete the availability if no time slots remain
-      if (availability.timeSlots.length === 0) {
-        await availability.deleteOne();
-        return res.status(200).json({ message: 'All slots removed for the given date' });
-      }
-  
-      await availability.save();
-      res.status(200).json({ message: 'Slots deleted successfully', availability });
-    } catch (err) {
-      console.error('Error deleting slot:', err.message);
-      res.status(500).json({ message: 'Failed to delete slot', error: err.message });
-    }
-};
-
-
 exports.bookedSlots = async (req, res) => {
 try {
-    const professorId = req.user._id; // Assuming authenticated professor
+    const professorId = req.user._id;
 
     // Fetch all booked appointments for the professor
-    const appointments = await Appointment.find({ professorId, status: 'booked' })
+    const appointments = await Appointment.find({ professorId })
     .populate('studentId', 'name email') // Populate student details
     .sort({ date: 1, timeSlot: 1 }); // Sort by date and time slot
 
@@ -88,26 +58,8 @@ try {
     return res.status(404).json({ message: 'Appointment not found' });
     }
 
-    // Update the status to 'cancelled'
-    appointment.status = 'cancelled';
-    await appointment.save();
-
-    // Restore the cancelled time slot to professor's availability
-    const availability = await Availability.findOne({ professorId, date: appointment.date });
-
-    if (availability) {
-    availability.timeSlots.push(appointment.timeSlot);
-    availability.timeSlots = [...new Set(availability.timeSlots)]; // Remove duplicates
-    await availability.save();
-    } else {
-    // Create a new availability if none exists for the date
-    await Availability.create({
-        professorId,
-        date: appointment.date,
-        timeSlots: [appointment.timeSlot],
-    });
-    }
-
+    // Delete the appointment
+    await Appointment.deleteOne({ _id: appointmentId });
     res.status(200).json({ message: 'Appointment cancelled successfully', appointment });
 } catch (err) {
     console.error('Error cancelling appointment:', err.message);

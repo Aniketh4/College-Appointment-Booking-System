@@ -1,0 +1,505 @@
+{
+	"info": {
+		"_postman_id": "f8da5d2a-7a8e-4848-9013-850238ef57a2",
+		"name": "Assignment E2E test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28225504"
+	},
+	"item": [
+		{
+			"name": "Student A1 authentication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Student A1 login successful\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"const jwt = pm.cookies.get(\"jwt\");\r",
+							"pm.collectionVariables.set(\"studentA1Token\", jwt);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"aniketh@gmail.com\",\r\n    \"password\": \"aniketh\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/auth/login",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Professor P1 authentication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Professor login successful\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"const jwt = pm.cookies.get(\"jwt\");\r",
+							"pm.collectionVariables.set(\"professorToken\", jwt);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"zahra@gmail.com\",\r\n    \"password\": \"zahra\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/auth/login",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Professor P1 creates slots",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.headers.add({\r",
+							"    key: \"Cookie\",\r",
+							"    value: `jwt={{professorToken}}`\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Professor creates slots successfully\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"date\": \"2025-01-09\",\r\n  \"timeSlots\": [\"09:00-10:00\", \"10:00-11:00\"]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/professors/createslot",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"professors",
+						"createslot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Student A1 views slots",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.headers.add({\r",
+							"    key: \"Cookie\",\r",
+							"    value: `jwt={{studentA1Token}}`\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Available slots fetched successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Save professorId and availability in collection variables\", function () {\r",
+							"    pm.response.to.have.status(200); // Check if the response status is 200\r",
+							"\r",
+							"    const responseData = pm.response.json(); // Parse the JSON response\r",
+							"\r",
+							"    // Assuming there's only one professor in the data array\r",
+							"    const professor = responseData.data[0];  // Change the index if there are more professors\r",
+							"\r",
+							"    const professorId = professor.professorId; // Extract professorId\r",
+							"    const availability = professor.availability; // Extract availability\r",
+							"\r",
+							"    // Save professorId and availability in collection variables\r",
+							"    pm.collectionVariables.set(\"professorId\", professorId);\r",
+							"    pm.collectionVariables.set(\"availability\", JSON.stringify(availability));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/students/listavailableprofessors",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"students",
+						"listavailableprofessors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Student A1 books slot",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.headers.add({\r",
+							"    key: \"Cookie\",\r",
+							"    value: `jwt={{studentA1Token}}`\r",
+							"});\r",
+							"\r",
+							"// Parse the availability data stored in collection variables\r",
+							"const availability = JSON.parse(pm.collectionVariables.get(\"availability\"));\r",
+							"\r",
+							"// Select the first availability slot\r",
+							"const selectedAvailability = availability[0];  // Selecting the first entry\r",
+							"\r",
+							"// Extract the date and timeSlot from the selected availability\r",
+							"const date = selectedAvailability.date;\r",
+							"const timeSlot = selectedAvailability.timeSlots[0];  // Select the first time slot\r",
+							"\r",
+							"// Set these values as variables to be used in the request body\r",
+							"pm.variables.set(\"A1date\", date);\r",
+							"pm.variables.set(\"A1timeSlot\", timeSlot);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"A1 books slot successfully\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Save appointmentId in collection variable\", function () {\r",
+							"    pm.response.to.have.status(201); // Ensure the status is 200\r",
+							"\r",
+							"    const responseData = pm.response.json();  // Parse the response JSON\r",
+							"    \r",
+							"    const appointmentId = responseData.appointment._id;  // Extract appointmentId (_id)\r",
+							"    \r",
+							"    // Save the appointmentId in a collection variable\r",
+							"    pm.collectionVariables.set(\"A1appointmentId\", appointmentId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"professorId\": \"{{professorId}}\",\r\n  \"date\": \"{{A1date}}\",\r\n  \"timeSlot\": \"{{A1timeSlot}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/students/bookslot",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"students",
+						"bookslot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Student A2 authentication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Student A2 login successful\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"const jwt = pm.cookies.get(\"jwt\");\r",
+							"pm.collectionVariables.set(\"studentA2Token\", jwt);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"A2@gmail.com\",\r\n    \"password\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/auth/login",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Student A2 books slot",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.headers.add({\r",
+							"    key: \"Cookie\",\r",
+							"    value: `jwt={{studentA2Token}}`\r",
+							"});\r",
+							"\r",
+							"// Parse the availability data stored in collection variables\r",
+							"const availability = JSON.parse(pm.collectionVariables.get(\"availability\"));\r",
+							"\r",
+							"// Select the first availability slot\r",
+							"const selectedAvailability = availability[0];  // Selecting the first entry\r",
+							"\r",
+							"// Extract the date and timeSlot from the selected availability\r",
+							"const date = selectedAvailability.date;\r",
+							"const timeSlot = selectedAvailability.timeSlots[1];  // Select the second time slot\r",
+							"\r",
+							"// Set these values as variables to be used in the request body\r",
+							"pm.variables.set(\"A2date\", date);\r",
+							"pm.variables.set(\"A2timeSlot\", timeSlot);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"A2 booked slot successfully\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"professorId\": \"{{professorId}}\",\r\n  \"date\": \"{{A2date}}\",\r\n  \"timeSlot\": \"{{A2timeSlot}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/students/bookslot",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"students",
+						"bookslot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Professor P1 cancels A1 appointment",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.headers.add({\r",
+							"    key: \"Cookie\",\r",
+							"    value: `jwt={{professorToken}}`\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Professor cancels slot with A1\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"appointmentId\": \"{{A1appointmentId}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/professors/cancelBookedSlot",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"professors",
+						"cancelBookedSlot"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Student A1 checks appointments",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.headers.add({\r",
+							"    key: \"Cookie\",\r",
+							"    value: `jwt={{studentA1Token}}`\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Student A1 realises appointment was cancelled\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/students/viewbookedslots",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"students",
+						"viewbookedslots"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

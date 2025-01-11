@@ -68,8 +68,7 @@ exports.bookslot = async (req, res) => {
         studentId,
         professorId,
         date: new Date(date),
-        timeSlot,
-        status: 'booked',
+        timeSlot
       });
   
       // Remove the booked time slot from the professor's availability
@@ -92,8 +91,7 @@ exports.viewbookedslots = async (req, res) => {
   
       // Fetch all booked appointments for the student
       const bookedSlots = await Appointment.find({ 
-        studentId, 
-        status: 'booked' 
+        studentId 
       }).populate('professorId', 'name email'); // Populate professor details
   
       // Check if the student has any bookings
