@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "newman run src/tests/Test1.json --env-var \"hostname=localhost:5000\"",
-    "run dev": "nodemon src/app.js",
+    "test": "newman run src/tests/test_complete_booking_cycle.json --env-var \"hostname=localhost:5000\"",
+    "dev": "nodemon src/app.js",
     "start": "node src/app.js"
   },
   "keywords": [],

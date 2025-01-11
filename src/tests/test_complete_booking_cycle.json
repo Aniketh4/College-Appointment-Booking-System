@@ -29,7 +29,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"aniketh@gmail.com\",\r\n    \"password\": \"aniketh\"\r\n}",
+					"raw": "{\r\n    \"name\": \"StudentA1\",\r\n    \"email\": \"StudentA1@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"role\": \"student\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -37,13 +37,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{hostname}}/auth/login",
+					"raw": "{{hostname}}/auth/signup",
 					"host": [
 						"{{hostname}}"
 					],
 					"path": [
 						"auth",
-						"login"
+						"signup"
 					]
 				}
 			},
@@ -71,7 +71,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"zahra@gmail.com\",\r\n    \"password\": \"zahra\"\r\n}",
+					"raw": "{\r\n    \"name\": \"ProfessorP1\",\r\n    \"email\": \"ProfessorP1@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"role\": \"professor\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -79,13 +79,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{hostname}}/auth/login",
+					"raw": "{{hostname}}/auth/signup",
 					"host": [
 						"{{hostname}}"
 					],
 					"path": [
 						"auth",
-						"login"
+						"signup"
 					]
 				}
 			},
@@ -316,7 +316,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"A2@gmail.com\",\r\n    \"password\": \"password\"\r\n}",
+					"raw": "{\r\n    \"name\": \"StudentA2\",\r\n    \"email\": \"StudentA2@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"role\": \"student\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -324,13 +324,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{hostname}}/auth/login",
+					"raw": "{{hostname}}/auth/signup",
 					"host": [
 						"{{hostname}}"
 					],
 					"path": [
 						"auth",
-						"login"
+						"signup"
 					]
 				}
 			},
@@ -373,7 +373,17 @@
 							"pm.test(\"A2 booked slot successfully\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
 							"});\r",
-							""
+							"\r",
+							"pm.test(\"Save appointmentId in collection variable\", function () {\r",
+							"    pm.response.to.have.status(201); // Ensure the status is 200\r",
+							"\r",
+							"    const responseData = pm.response.json();  // Parse the response JSON\r",
+							"    \r",
+							"    const appointmentId = responseData.appointment._id;  // Extract appointmentId (_id)\r",
+							"    \r",
+							"    // Save the appointmentId in a collection variable\r",
+							"    pm.collectionVariables.set(\"A2appointmentId\", appointmentId);\r",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -496,6 +506,59 @@
 					"path": [
 						"students",
 						"viewbookedslots"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cleanup (deleting A2's slot)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.headers.add({\r",
+							"    key: \"Cookie\",\r",
+							"    value: `jwt={{professorToken}}`\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Removed student A2's booking successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"appointmentId\": \"{{A2appointmentId}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}/professors/cancelBookedSlot",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"professors",
+						"cancelBookedSlot"
 					]
 				}
 			},

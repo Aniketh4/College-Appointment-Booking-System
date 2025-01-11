@@ -37,6 +37,13 @@ The system includes the following features:
 
 **Note**: All API endpoints return appropriate status codes: 200 or 201 for success, and 400, 404, or 500 for various errors.
 
+## Database Design
+- User: {name, email, password, role}
+- Availability: {professorId, date, timeSlots}
+- Appointment: {studentId, professorId, date, timeSlot}
+
+The `User` collection saves information about students and professors, which is used for authentication and other purposes. The `Availability` collection holds information about the different time slots that professors have made available. The `Appointment` collection contains all the booked slots, linking students to professors for specific dates and times.
+
 ## Tech Stack
 - Node.js
 - Express
@@ -52,16 +59,16 @@ The system includes the following features:
 - Password hashing with Bcrypt
 
 ## Testing Instructions
-Run test using Newman
-Command: npm test
+- Run test using Newman (Edit test script in package.json as per requirement)
+- Command: npm test
 
 ## Test Flow Description
-Student A1 authenticates by signing up to access the system.
-Professor P1 authenticates by signing up to access the system.
-Professor P1 specifies which time slots he is free for appointments.
-Student A1 views available time slots for Professor P1.
-Student A1 books an appointment with Professor P1 for time T1.
-Student A2 authenticates by signing up to access the system.
-Student A2 books an appointment with Professor P1 for time T2.
-Professor P1 cancels the appointment with Student A1.
-Student A1 checks their appointments and realizes they do not have any pending appointments.
+1. Student A1 authenticates by signing up to access the system.
+2. Professor P1 authenticates by signing up to access the system.
+3. Professor P1 specifies which time slots he is free for appointments.
+4. Student A1 views available time slots for Professor P1.
+5. Student A1 books an appointment with Professor P1 for time T1.
+6. Student A2 authenticates by signing up to access the system.
+7. Student A2 books an appointment with Professor P1 for time T2.
+8. Professor P1 cancels the appointment with Student A1.
+9. Student A1 checks their appointments and realizes they do not have any pending appointments.
