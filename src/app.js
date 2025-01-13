@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const connectDB = require('./db.js')
-const Authentication = require('./middleware/authMiddleware.js')
+const { authenticateProfessor, authenticateStudent } = require('./middleware/authMiddleware.js')
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -22,9 +22,10 @@ app.use(cookieParser());
 app.use(cors({ origin: true, credentials: true }));
 
 app.use('/auth', authRoutes);
-//authentication middleware to check if the user is authenticated needed for students and professors
-app.use('/students', Authentication, studentRoutes);
-app.use('/professors', Authentication, professorRoutes);
+//authentication middleware to check if the user is a student for student routes
+app.use('/students', authenticateStudent, studentRoutes);
+//authentication middleware to check if the user is a professor for professor routes
+app.use('/professors', authenticateProfessor, professorRoutes);
 
 app.use((req, res) => {
     res.status(404).json({ message: 'Route does not exist, please check the documentation' });
