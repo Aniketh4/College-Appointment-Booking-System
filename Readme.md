@@ -25,12 +25,12 @@ The system includes the following features:
 - POST /api/auth/login {email, password}
 - POST /api/auth/logout
 
-### For students
+### For students (can only be accessed if authenticated and is a student)
 - GET /api/students/listavailableprofessors {studentId, professorId(optional), date(optional)}
 - POST /api/students/bookslot {studentId, professorId, date, timeSlot}
 - GET /api/students/viewbookedslots {studentId}
 
-### For professors
+### For professors (can only be accessed if authenticated and is a professor)
 - POST /api/professors/createavailability {professorId, date, timeSlots}
 - GET /api/professors/viewbookedslots {professorId}
 - DELETE /api/professors/cancelappointment {professorId, appointmentId}
